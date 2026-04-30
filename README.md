@@ -1,4 +1,4 @@
-# AutoReplant
+# AutoReplants
 
 A client-side Fabric mod that automatically replants crops when you break them while holding a hoe.
 
