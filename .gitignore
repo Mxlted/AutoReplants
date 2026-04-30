@@ -1,0 +1,41 @@
+# Build outputs
+build/
+out/
+bin/
+
+# Gradle
+.gradle/
+gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.code-workspace
+.settings/
+.project
+.classpath
+
+# Eclipse
+eclipse/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Fabric
+run/
+logs/
+*.log
+
+# Java
+*.class
+hs_err_pid*
+
+# Caches
+.cache/
