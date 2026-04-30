@@ -19,7 +19,7 @@ A client-side Fabric mod that automatically replants crops when you break them w
 ## Build from Source
 
 ```bash
-git clone https://github.com/Mxlted/autoreplant.git
+git clone https://github.com/Mxlted/autoreplants.git
 cd autoreplant
 gradlew build
 ```
