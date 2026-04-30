@@ -21,5 +21,5 @@ A client-side Fabric mod that automatically replants crops when you harvest them
 ```bash
 git clone https://github.com/Mxlted/autoreplant.git
 cd autoreplant
-./gradlew build
+gradlew build
 ```
