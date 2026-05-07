@@ -1,18 +1,19 @@
 {
     "schemaVersion": 1,
-    "id": "autoreplant",
+    "id": "autoreplants",
     "version": "${version}",
-    "name": "AutoReplant",
+    "name": "AutoReplants",
     "description": "Automatically replants crops when harvesting with a hoe",
+    "icon": "assets/autoreplants/icon.png",
     "authors": [
-        "AutoReplant Team"
+        "AutoReplants Team"
     ],
     "contact": {},
     "license": "MIT",
     "environment": "client",
     "entrypoints": {
         "client": [
-            "com.autoreplant.AutoReplantMod"
+            "com.autoreplants.AutoReplantsMod"
         ]
     },
     "depends": {
