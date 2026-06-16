@@ -12,9 +12,9 @@ A client-side Fabric mod that automatically replants crops when you break them w
 
 ## Version Compatibility
 
-- Minecraft: 26.2
+- Minecraft: 26.x
 - Fabric Loader: 0.19.3 or higher
-- Fabric API: 0.152.1+26.2
+- Fabric API: 0.152.1 or higher, using a build compatible with your Minecraft 26.x version
 
 ## Build from Source
 
