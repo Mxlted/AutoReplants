@@ -6,11 +6,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.PitcherCropBlock;
@@ -24,6 +27,9 @@ import java.util.Deque;
 import java.util.Map;
 
 public class AutoReplantsHandler {
+    private static final int HOTBAR_SIZE = 9;
+    private static final int REPLANT_DELAY_TICKS = 2;
+
     private static final Map<Block, Item> CROP_TO_SEED = Map.of(
         Blocks.WHEAT, Items.WHEAT_SEEDS,
         Blocks.CARROTS, Items.CARROT,
@@ -34,16 +40,17 @@ public class AutoReplantsHandler {
         Blocks.PITCHER_CROP, Items.PITCHER_POD
     );
 
-    private static final int REPLANT_DELAY_TICKS = 2;
     private static final Deque<PendingReplant> pendingReplants = new ArrayDeque<>();
 
     private static final class PendingReplant {
+        private final ResourceKey<Level> dimension;
         private final BlockPos supportPos;
         private final Item seedItem;
         private int seedSlot;
         private int ticksRemaining = REPLANT_DELAY_TICKS;
 
-        private PendingReplant(BlockPos supportPos, Item seedItem, int seedSlot) {
+        private PendingReplant(ResourceKey<Level> dimension, BlockPos supportPos, Item seedItem, int seedSlot) {
+            this.dimension = dimension;
             this.supportPos = supportPos;
             this.seedItem = seedItem;
             this.seedSlot = seedSlot;
@@ -56,6 +63,10 @@ public class AutoReplantsHandler {
 
             ticksRemaining--;
             return true;
+        }
+
+        private boolean matches(ResourceKey<Level> dimension, BlockPos supportPos) {
+            return this.dimension.equals(dimension) && this.supportPos.equals(supportPos);
         }
     }
 
@@ -85,7 +96,10 @@ public class AutoReplantsHandler {
                 return;
             }
 
-            pendingReplants.addLast(new PendingReplant(getSupportPos(pos, state), seedItem, hotbarSlot));
+            ResourceKey<Level> dimension = world.dimension();
+            BlockPos supportPos = getSupportPos(pos, state);
+            pendingReplants.removeIf(replant -> replant.matches(dimension, supportPos));
+            pendingReplants.addLast(new PendingReplant(dimension, supportPos, seedItem, hotbarSlot));
         });
     }
 
@@ -103,6 +117,10 @@ public class AutoReplantsHandler {
 
         for (int i = 0; i < replantCount; i++) {
             PendingReplant replant = pendingReplants.removeFirst();
+            if (!isSameDimension(mc, replant)) {
+                continue;
+            }
+
             if (replant.waitAnotherTick()) {
                 pendingReplants.addLast(replant);
             } else {
@@ -117,6 +135,10 @@ public class AutoReplantsHandler {
             return;
         }
 
+        if (!isSameDimension(mc, replant) || !canAttemptReplant(mc.level, replant)) {
+            return;
+        }
+
         int seedSlot = replant.seedSlot;
         if (!isSeedInSlot(player, seedSlot, replant.seedItem)) {
             seedSlot = findSeedInHotbar(player, replant.seedItem);
@@ -128,8 +150,7 @@ public class AutoReplantsHandler {
 
         var inventory = player.getInventory();
         int previousSlot = inventory.getSelectedSlot();
-
-        inventory.setSelectedSlot(seedSlot);
+        boolean changedSlot = previousSlot != seedSlot;
 
         BlockHitResult hitResult = new BlockHitResult(
             Vec3.atCenterOf(replant.supportPos).add(0, 0.5, 0),
@@ -139,10 +160,46 @@ public class AutoReplantsHandler {
         );
 
         try {
+            if (changedSlot) {
+                selectHotbarSlot(player, seedSlot);
+            }
             mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, hitResult);
         } finally {
-            inventory.setSelectedSlot(previousSlot);
+            if (changedSlot) {
+                selectHotbarSlot(player, previousSlot);
+            }
         }
+    }
+
+    private static boolean isSameDimension(Minecraft mc, PendingReplant replant) {
+        return mc.level != null && mc.level.dimension().equals(replant.dimension);
+    }
+
+    private static boolean canAttemptReplant(Level level, PendingReplant replant) {
+        BlockState supportState = level.getBlockState(replant.supportPos);
+        if (!isValidSupport(supportState, replant.seedItem)) {
+            return false;
+        }
+
+        if (!level.getBlockState(replant.supportPos.above()).isAir()) {
+            return false;
+        }
+
+        return replant.seedItem != Items.PITCHER_POD
+            || level.getBlockState(replant.supportPos.above(2)).isAir();
+    }
+
+    private static boolean isValidSupport(BlockState supportState, Item seedItem) {
+        if (seedItem == Items.NETHER_WART) {
+            return supportState.is(Blocks.SOUL_SAND);
+        }
+
+        return supportState.is(Blocks.FARMLAND);
+    }
+
+    private static void selectHotbarSlot(LocalPlayer player, int slot) {
+        player.getInventory().setSelectedSlot(slot);
+        player.connection.send(new ServerboundSetCarriedItemPacket(slot));
     }
 
     private static boolean isHoldingHoe(LocalPlayer player) {
@@ -159,7 +216,7 @@ public class AutoReplantsHandler {
     }
 
     private static int findSeedInHotbar(LocalPlayer player, Item seedItem) {
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < HOTBAR_SIZE; i++) {
             if (isSeedInSlot(player, i, seedItem)) {
                 return i;
             }
@@ -168,6 +225,10 @@ public class AutoReplantsHandler {
     }
 
     private static boolean isSeedInSlot(LocalPlayer player, int slot, Item seedItem) {
+        if (slot < 0 || slot >= HOTBAR_SIZE) {
+            return false;
+        }
+
         ItemStack stack = player.getInventory().getItem(slot);
         return !stack.isEmpty() && stack.getItem() == seedItem;
     }

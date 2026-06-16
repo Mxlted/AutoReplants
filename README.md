@@ -8,7 +8,7 @@ A client-side Fabric mod that automatically replants crops when you break them w
 - Works with wheat, carrots, potatoes, beetroots, nether wart, torchflower, and pitcher crops
 - Seeds must be in your hotbar to replant
 - Works at any crop growth stage
-- Client-side only, works on any server
+- Client-side only; replanting uses normal item-use packets, so servers can still reject placement if the crop space changes or a server rule blocks it
 
 ## Version Compatibility
 

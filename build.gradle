@@ -5,6 +5,7 @@ plugins {
 
 version = project.mod_version
 group = project.maven_group
+def javaVersion = Integer.parseInt(project.java_version)
 
 base {
     archivesName = project.archives_base_name
@@ -23,7 +24,7 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
+        languageVersion = JavaLanguageVersion.of(javaVersion)
     }
     withSourcesJar()
 }
@@ -32,19 +33,21 @@ processResources {
     inputs.property "version", project.version
     inputs.property "minecraft_version", project.minecraft_version
     inputs.property "loader_version", project.loader_version
+    inputs.property "fabric_version", project.fabric_version
 
     filesMatching("fabric.mod.json") {
         expand(
             "version": project.version,
             "minecraft_version": project.minecraft_version,
-            "loader_version": project.loader_version
+            "loader_version": project.loader_version,
+            "fabric_version": project.fabric_version
         )
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
-    options.release = 25
+    options.release = javaVersion
 }
 
 jar {
