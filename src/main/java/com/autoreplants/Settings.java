@@ -21,4 +21,3 @@ public class Settings {
         replantDelay = Math.clamp(replantDelay, 0, 10);
     }
 }
-

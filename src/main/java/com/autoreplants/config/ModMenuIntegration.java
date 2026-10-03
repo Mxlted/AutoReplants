@@ -13,4 +13,3 @@ public class ModMenuIntegration implements ModMenuApi {
         return parent -> SettingsScreen.create(parent);
     }
 }
-

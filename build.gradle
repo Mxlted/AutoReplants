@@ -40,6 +40,7 @@ processResources {
     inputs.property "loader_version", project.loader_version
     inputs.property "fabric_version", project.fabric_version
     inputs.property "fabric_api_version_range", project.fabric_api_version_range
+    inputs.property "java_version", project.java_version
 
     filesMatching("fabric.mod.json") {
         expand(
@@ -48,7 +49,8 @@ processResources {
             "minecraft_version_range": project.minecraft_version_range,
             "loader_version": project.loader_version,
             "fabric_version": project.fabric_version,
-            "fabric_api_version_range": project.fabric_api_version_range
+            "fabric_api_version_range": project.fabric_api_version_range,
+            "java_version": project.java_version
         )
     }
 }

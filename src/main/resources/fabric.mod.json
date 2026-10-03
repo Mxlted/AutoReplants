@@ -6,9 +6,13 @@
     "description": "Automatically replants crops when harvesting with a hoe",
     "icon": "assets/autoreplants/icon.png",
     "authors": [
-        "AutoReplants Team"
+        "Mxlted"
     ],
-    "contact": {},
+    "contact": {
+        "homepage": "https://modrinth.com/mod/autoreplants",
+        "sources": "https://github.com/Mxlted/AutoReplants",
+        "issues": "https://github.com/Mxlted/AutoReplants/issues"
+    },
     "license": "MIT",
     "environment": "client",
     "entrypoints": {
@@ -24,6 +28,7 @@
     "depends": {
         "fabricloader": ">=${loader_version}",
         "fabric-api": "${fabric_api_version_range}",
-        "minecraft": "${minecraft_version_range}"
+        "minecraft": "${minecraft_version_range}",
+        "java": ">=${java_version}"
     }
 }
