@@ -14,7 +14,12 @@
     "entrypoints": {
         "client": [
             "com.autoreplants.AutoReplantsMod"
-        ]
+        ],
+        "modmenu": ["com.autoreplants.config.ModMenuIntegration"]
+    },
+    "suggests": {
+        "modmenu": "*",
+        "cloth-config": "*"
     },
     "depends": {
         "fabricloader": ">=${loader_version}",

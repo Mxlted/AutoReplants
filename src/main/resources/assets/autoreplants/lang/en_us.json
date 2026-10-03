@@ -1,1 +1,14 @@
-{}
+{
+    "autoreplants.settings.title": "AutoReplants Settings",
+    "autoreplants.settings.general": "General",
+    "autoreplants.settings.enabled": "Enabled",
+    "autoreplants.settings.enabled.tooltip": "Enable automatic replanting.",
+    "autoreplants.settings.requireHoe": "Require a hoe",
+    "autoreplants.settings.requireHoe.tooltip": "Only replant while holding a hoe in either hand.",
+    "autoreplants.settings.matureOnly": "Mature crops only",
+    "autoreplants.settings.matureOnly.tooltip": "Only replant crops that were fully grown when broken.",
+    "autoreplants.settings.replantDelay": "Replant delay",
+    "autoreplants.settings.replantDelay.tooltip": "Ticks to wait before planting. 20 ticks is about one second.",
+    "autoreplants.settings.sneakBypass": "Sneak to bypass",
+    "autoreplants.settings.sneakBypass.tooltip": "Hold sneak to clear crops without replanting."
+}
